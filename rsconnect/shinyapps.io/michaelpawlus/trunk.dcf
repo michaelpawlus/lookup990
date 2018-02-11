@@ -1,0 +1,13 @@
+name: trunk
+title: trunk
+username:
+account: michaelpawlus
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 277896
+bundleId: 1217292
+url: https://michaelpawlus.shinyapps.io/trunk/
+when: 1518331620.26717
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: eins1.csv|README.md
