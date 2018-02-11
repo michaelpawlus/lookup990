@@ -4,7 +4,20 @@ library(shiny)
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("Uploading Files"),
+  titlePanel("IRS 990 Lookup"),
+  
+  # Add in a line break
+  br(),
+  
+  # insert a row with helper text
+  fluidRow(
+    column(10,
+           p("Insert a CSV file with a single column of EINs and the app returns details from IRS 990 filings.")
+           )
+    ),
+  
+  # Insert one more line break
+  br(),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -13,7 +26,7 @@ ui <- fluidPage(
     sidebarPanel(
       
       # Input: Select a file ----
-      fileInput("file1", "Choose CSV File",
+      fileInput("file1", "Upload a CSV file of EINs in a single column",
                 multiple = TRUE,
                 accept = c("text/csv",
                            "text/comma-separated-values,text/plain",
@@ -23,10 +36,10 @@ ui <- fluidPage(
       tags$hr(),
       
       # Input: Checkbox if file has header ----
-      checkboxInput("header", "Header", TRUE),
+      checkboxInput("header", "Check if the file has a header row", TRUE),
       
       # Input: Select number of rows to display ----
-      radioButtons("disp", "Display",
+      radioButtons("disp", "Choose to display all the data or just the top rows (head):",
                    choices = c(Head = "head",
                                All = "all"),
                    selected = "head")
@@ -81,7 +94,7 @@ server <- function(input, output) {
       xf <- read_xml( x=url, options=NULL )
       xml_ns_strip( xf )
       name <- xf %>% xml_find_all("//Return/ReturnHeader/Filer/BusinessName/BusinessNameLine1Txt") %>% xml_text()
-      fy_gifts <- xf %>% xml_find_all(".//CYContributionsGrantsAmt") %>% xml_integer()
+      fy_gifts <- xf %>% xml_find_all(".//CYGrantsAndSimilarPaidAmt") %>% xml_integer()
       tibble(org_name = name, 
              grants = fy_gifts)
       
@@ -98,8 +111,8 @@ server <- function(input, output) {
       keep(~ length(.x$org_name) > 0) %>%
       {
         tibble(
-          found_name = map_chr(., "org_name"),
-          contributions = map_int(., "grants")
+          `Foundation Name` = map_chr(., "org_name"),
+          `Current FY Giving` = map_int(., "grants")
         )
       }
     
